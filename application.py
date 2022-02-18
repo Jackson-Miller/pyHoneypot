@@ -3,7 +3,7 @@ import secrets
 from forms import LoginForm
 from azure.core.credentials import AzureNamedKeyCredential
 from azure.data.tables import TableServiceClient
-from flask import Flask, flash, redirect, request, render_template, url_for
+from flask import Flask, flash, jsonify, redirect, request, render_template, url_for
 
 credential = AzureNamedKeyCredential(os.environ["AZ_STORAGE_ACCOUNT"], os.environ["AZ_STORAGE_KEY"])
 
@@ -37,7 +37,8 @@ def home():
 def login():
     name = request.form["username"]
     password = request.form["password"]
-    ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+    ip = request.remote_addr
+    print(ip)
     write_storage_table(name, password, ip)
 
     flash("Invalid username or password.")
