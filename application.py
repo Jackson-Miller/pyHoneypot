@@ -58,7 +58,6 @@ def login():
     name = request.form["username"]
     password = request.form["password"]
     ip = request.remote_addr
-    print(ip)
     write_storage_table(name, password, ip)
 
     flash("Invalid username or password.")
@@ -66,4 +65,4 @@ def login():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
