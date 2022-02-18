@@ -25,6 +25,26 @@ def write_storage_table(username, password, ip):
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ["SECRET_KEY"]
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+)
+
+
+@app.after_request
+def add_security_headers(response):
+    response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' https://*.jsdelivr.net;"
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Permissions-Policy'] = 'accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), ' \
+                                             'display-capture=(), document-domain=(), encrypted-media=(), ' \
+                                             'fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), ' \
+                                             'magnetometer=(), microphone=(), midi=(), payment=(), ' \
+                                             'picture-in-picture=(), publickey-credentials-get=(), ' \
+                                             'screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), ' \
+                                             'xr-spatial-tracking=()'
+    return response
 
 
 @app.route("/")
@@ -46,4 +66,4 @@ def login():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
