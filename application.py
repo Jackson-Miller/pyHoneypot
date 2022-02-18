@@ -24,22 +24,6 @@ def write_storage_table(username, password, ip):
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ["SECRET_KEY"]
-app.config.update(
-    SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax',
-)
-
-
-@app.after_request
-def add_security_headers(resp):
-    response = app.make_response(url_for("home"))
-    response.headers['Content-Security-Policy'] = "default-src 'self'"
-    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
-    response.headers['Permissions-Policy'] = 'none'
-    return response
 
 
 @app.route("/")
