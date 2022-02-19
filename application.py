@@ -26,9 +26,10 @@ def write_storage_table(username, password, ip):
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ["SECRET_KEY"]
 app.config.update(
+    SESSION_COOKIE_NAME="_Host-session",
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax',
+    SESSION_COOKIE_SAMESITE='Strict',
 )
 
 
