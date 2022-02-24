@@ -1,11 +1,9 @@
 import os
 import secrets
 from forms import LoginForm
-from azure.core.credentials import AzureNamedKeyCredential
 from azure.data.tables import TableServiceClient
+from azure.core.credentials import AzureNamedKeyCredential
 from flask import Flask, flash, jsonify, redirect, request, render_template, url_for
-
-credential = AzureNamedKeyCredential(os.environ["AZ_STORAGE_ACCOUNT"], os.environ["AZ_STORAGE_KEY"])
 
 
 def write_storage_table(username, password, ip):
@@ -16,6 +14,8 @@ def write_storage_table(username, password, ip):
         "Password": password,
         "IPAddress": ip
     }
+
+    credential = AzureNamedKeyCredential(os.environ["AZ_STORAGE_ACCOUNT"], os.environ["AZ_STORAGE_KEY"])
     service = TableServiceClient(endpoint=os.environ["AZ_STORAGE_ENDPOINT"], credential=credential)
     client = service.get_table_client(table_name=os.environ["AZ_STORAGE_TABLE"])
     entity_results = client.create_entity(entity=entity)
