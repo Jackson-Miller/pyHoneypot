@@ -5,7 +5,7 @@ from forms import LoginForm
 from authlib.integrations.flask_client import OAuth
 from azure.data.tables import TableServiceClient
 from azure.core.credentials import AzureNamedKeyCredential
-from flask import Flask, flash, redirect, request, render_template, session, url_for
+from flask import Flask, flash, redirect, request, render_template, url_for
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 
 
@@ -86,6 +86,7 @@ oauth.register(
     name='azure',
     client_id=os.environ["CLIENT_ID"],
     client_secret=os.environ["CLIENT_SECRET"],
+    redirect_uri="https://admin.thejacksonmiller.com/callback",
     server_metadata_url=os.environ["OIDC_METADATA"],
     client_kwargs={
         'scope': 'openid email profile'
