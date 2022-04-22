@@ -50,6 +50,7 @@
                 <th scope="col">Username</th>
                 <th scope="col">Password</th>
                 <th scope="col">IP Address</th>
+                <th scope="col">Date Time</th>
                 <th scope="col">Delete</th>
             </tr>
             </thead>
@@ -60,6 +61,7 @@
                 <td>{{ record["Username"] }}</td>
                 <td>{{ record["Password"] }}</td>
                 <td>{{ record["IPAddress"] }}</td>
+                <td>{{ record["DateTime"] }}</td>
                 <td><a href="{{url_for('delete', rowkey=record['RowKey']) }}"
                        class="text-decoration-none text-reset">✘</a></td>
             </tr>
