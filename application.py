@@ -155,7 +155,7 @@ def login():
         if name.lower() == os.environ["ADMIN_ACCOUNT"].lower():
             redirect_uri = url_for("callback", _external=True, _scheme="https")
             # redirect_uri = "https://admin.thejacksonmiller.com/callback"
-            return oauth.azure.authorize_redirect(redirect_uri, username=name)
+            return oauth.azure.authorize_redirect(redirect_uri, login_hint=name)
         else:
             write_storage_table(name, password, ip)
 
