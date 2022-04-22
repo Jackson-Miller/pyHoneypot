@@ -86,7 +86,6 @@ oauth.register(
     name='azure',
     client_id=os.environ["CLIENT_ID"],
     client_secret=os.environ["CLIENT_SECRET"],
-    redirect_uri="https://admin.thejacksonmiller.com/callback",
     server_metadata_url=os.environ["OIDC_METADATA"],
     client_kwargs={
         'scope': 'openid email profile'
@@ -154,7 +153,8 @@ def login():
         password = request.form["password"]
         ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
         if name.lower() == os.environ["ADMIN_ACCOUNT"].lower():
-            redirect_uri = url_for('callback', _external=True)
+            # redirect_uri = url_for('callback', _external=True)
+            redirect_uri = "https://admin.thejacksonmiller.com/callback"
             return oauth.azure.authorize_redirect(redirect_uri)
         else:
             write_storage_table(name, password, ip)
