@@ -132,7 +132,7 @@ def home():
 
 
 @app.route("/results")
-@login_required
+#@login_required
 def results():
     table = read_storage_table("PartitionKey eq 'honeypot'")
     return render_template("results.html", data=table, current_user=current_user)
@@ -188,4 +188,4 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
