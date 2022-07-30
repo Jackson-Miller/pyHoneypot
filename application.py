@@ -154,7 +154,6 @@ def login():
         ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
         if name.lower() == os.environ["ADMIN_ACCOUNT"].lower():
             redirect_uri = url_for("callback", _external=True, _scheme="https")
-            # redirect_uri = "https://admin.thejacksonmiller.com/callback"
             return oauth.azure.authorize_redirect(redirect_uri, login_hint=name)
         else:
             write_storage_table(name, password, ip)
@@ -162,7 +161,6 @@ def login():
         flash("Invalid username or password.")
     else:
         pass
-        # flash(form.errors)
 
     return render_template("index.html", form=form)
 
