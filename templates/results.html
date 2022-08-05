@@ -43,6 +43,7 @@
 
 <div class="container-xxl my-md-4 bd-layout">
     <main>
+        <h2>Password List</h2>
         <table class="table table-hover">
             <thead class="table-dark">
             <tr>
@@ -55,14 +56,40 @@
             </tr>
             </thead>
             <tbody>
-            {% for record in data: %}
+            {% for record in pw_data: %}
             <tr>
                 <td>{{ loop.index }}</td>
                 <td>{{ record["Username"] }}</td>
                 <td>{{ record["Password"] }}</td>
                 <td>{{ record["IPAddress"] }}</td>
                 <td>{{ record["DateTime"] }}</td>
-                <td><a href="{{url_for('delete', rowkey=record['RowKey']) }}"
+                <td><a href="{{url_for('delete', table='honeypot', rowkey=record['RowKey']) }}"
+                       class="text-decoration-none text-reset">✘</a></td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+        <div><p><br></p></div>
+        <h2>URI List</h2>
+        <table class="table table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">URL</th>
+                <th scope="col">IP Address</th>
+                <th scope="col">Date Time</th>
+                <th scope="col">Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for record in uri_data: %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ record["URL"] }}</td>
+                <td>{{ record["IPAddress"] }}</td>
+                <td>{{ record["DateTime"] }}</td>
+                <td><a href="{{url_for('delete', table='uri', rowkey=record['RowKey']) }}"
                        class="text-decoration-none text-reset">✘</a></td>
             </tr>
             {% endfor %}

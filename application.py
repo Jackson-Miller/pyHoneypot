@@ -9,16 +9,7 @@ from flask import Flask, flash, redirect, request, render_template, url_for
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 
 
-def write_storage_table(username, password, ip):
-    entity = {
-        "PartitionKey": "honeypot",
-        "RowKey": str(secrets.token_hex(16)),
-        "DateTime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "Username": username,
-        "Password": password,
-        "IPAddress": ip
-    }
-
+def write_storage_table(entity):
     credential = AzureNamedKeyCredential(os.environ["AZ_STORAGE_ACCOUNT"], os.environ["AZ_STORAGE_KEY"])
     service = TableServiceClient(endpoint=os.environ["AZ_STORAGE_ENDPOINT"], credential=credential)
     client = service.get_table_client(table_name=os.environ["AZ_STORAGE_TABLE"])
@@ -134,14 +125,15 @@ def home():
 @app.route("/results")
 @login_required
 def results():
-    table = read_storage_table("PartitionKey eq 'honeypot'")
-    return render_template("results.html", data=table, current_user=current_user)
+    pw_table = read_storage_table("PartitionKey eq 'honeypot'")
+    uri_table = read_storage_table("PartitionKey eq 'uri'")
+    return render_template("results.html", pw_data=pw_table, uri_data=uri_table, current_user=current_user)
 
 
-@app.route("/delete/<rowkey>")
+@app.route("/delete/<table>/<rowkey>")
 @login_required
-def delete(rowkey):
-    remove_storage_entity("honeypot", rowkey)
+def delete(table, rowkey):
+    remove_storage_entity(table, rowkey)
     return redirect(url_for("results"))
 
 
@@ -156,7 +148,15 @@ def login():
             redirect_uri = url_for("callback", _external=True, _scheme="https")
             return oauth.azure.authorize_redirect(redirect_uri, login_hint=name)
         else:
-            write_storage_table(name, password, ip)
+            entity = {
+                "PartitionKey": "honeypot",
+                "RowKey": str(secrets.token_hex(16)),
+                "DateTime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "Username": name,
+                "Password": password,
+                "IPAddress": ip
+            }
+            write_storage_table(entity)
 
         flash("Invalid username or password.")
     else:
@@ -187,6 +187,15 @@ def logout():
 
 @app.errorhandler(404)
 def page_not_found(e):
+    entity = {
+        "PartitionKey": "uri",
+        "RowKey": str(secrets.token_hex(16)),
+        "DateTime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "IPAddress": request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr),
+        "URL": request.url
+    }
+    print(entity)
+    write_storage_table(entity)
     return render_template('404.html'), 404
 
 
