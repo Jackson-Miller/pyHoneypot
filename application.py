@@ -194,7 +194,6 @@ def page_not_found(e):
         "IPAddress": request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr),
         "URL": request.url
     }
-    print(entity)
     write_storage_table(entity)
     return render_template('404.html'), 404
 
