@@ -3,7 +3,7 @@ import secrets
 from datetime import datetime, timedelta
 from forms import LoginForm
 from authlib.integrations.flask_client import OAuth
-from azure.data.tables import TableServiceClient
+from azure.data.tables import TableServiceClient, UpdateMode
 from azure.core.credentials import AzureNamedKeyCredential
 from flask import Flask, flash, redirect, request, render_template, url_for
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
@@ -14,6 +14,15 @@ def write_storage_table(entity):
     service = TableServiceClient(endpoint=os.environ["AZ_STORAGE_ENDPOINT"], credential=credential)
     client = service.get_table_client(table_name=os.environ["AZ_STORAGE_TABLE"])
     client.create_entity(entity=entity)
+    client.close()
+    service.close()
+
+
+def update_storage_table(entity):
+    credential = AzureNamedKeyCredential(os.environ["AZ_STORAGE_ACCOUNT"], os.environ["AZ_STORAGE_KEY"])
+    service = TableServiceClient(endpoint=os.environ["AZ_STORAGE_ENDPOINT"], credential=credential)
+    client = service.get_table_client(table_name=os.environ["AZ_STORAGE_TABLE"])
+    client.update_entity(mode=UpdateMode.MERGE, entity=entity)
     client.close()
     service.close()
 
@@ -187,15 +196,31 @@ def logout():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    entity = {
-        "PartitionKey": "uri",
-        "RowKey": str(secrets.token_hex(16)),
-        "DateTime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "IPAddress": request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr),
-        "URL": request.url
-    }
-    write_storage_table(entity)
+    url_data = ""
+    url = request.url
+    url_results = read_storage_table(f"PartitionKey eq 'uri' and URL eq '{url}'")
+
+    for url_result in url_results:
+        url_data = url_result
+    if url_data:
+        url_data["Count"] = url_data["Count"] + 1
+        url_data["DateTimeLastAccessed"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        update_storage_table(url_data)
+    else:
+        entity = {
+            "PartitionKey": "uri",
+            "RowKey": str(secrets.token_hex(16)),
+            "DateTimeLastAccessed": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "URL": url,
+            "Count": 1
+        }
+        write_storage_table(entity)
     return render_template('404.html'), 404
+
+
+@app.errorhandler(400)
+def page_not_found(e):
+    return render_template('400.html'), 400
 
 
 if __name__ == "__main__":

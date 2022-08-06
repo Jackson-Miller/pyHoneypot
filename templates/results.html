@@ -77,7 +77,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">URL</th>
-                <th scope="col">IP Address</th>
+                <th scope="col">Count</th>
                 <th scope="col">Date Time</th>
                 <th scope="col">Delete</th>
             </tr>
@@ -87,8 +87,8 @@
             <tr>
                 <td>{{ loop.index }}</td>
                 <td>{{ record["URL"] }}</td>
-                <td>{{ record["IPAddress"] }}</td>
-                <td>{{ record["DateTime"] }}</td>
+                <td>{{ record["Count"] }}</td>
+                <td>{{ record["DateTimeLastAccessed"] }}</td>
                 <td><a href="{{url_for('delete', table='uri', rowkey=record['RowKey']) }}"
                        class="text-decoration-none text-reset">✘</a></td>
             </tr>
