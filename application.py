@@ -83,7 +83,7 @@ login_manager.session_protection = "strong"
 login_manager.init_app(app)
 oauth = OAuth(app)
 oauth.register(
-    name='azure',
+    name='oidc',
     client_id=os.environ["CLIENT_ID"],
     client_secret=os.environ["CLIENT_SECRET"],
     server_metadata_url=os.environ["OIDC_METADATA"],
@@ -155,7 +155,7 @@ def login():
         ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
         if name.lower() == os.environ["ADMIN_ACCOUNT"].lower():
             redirect_uri = url_for("callback", _external=True, _scheme="https")
-            return oauth.azure.authorize_redirect(redirect_uri, login_hint=name)
+            return oauth.oidc.authorize_redirect(redirect_uri, login_hint=name)
         else:
             entity = {
                 "PartitionKey": "honeypot",
@@ -176,7 +176,7 @@ def login():
 
 @app.route('/callback')
 def callback():
-    token = oauth.azure.authorize_access_token()
+    token = oauth.oidc.authorize_access_token()
     user_details = token.get('userinfo')
     user = get_user(user_details)
     if user:
@@ -190,8 +190,12 @@ def callback():
 @app.route('/logout')
 @login_required
 def logout():
+    metadata = oauth.oidc.load_server_metadata()
+    end_session_endpoint = metadata.get('end_session_endpoint')
+    redirect_uri = url_for("home", _external=True, _scheme="https")
+    logout_uri = f"{end_session_endpoint}?post_logout_redirect_uri={redirect_uri }"
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(logout_uri)
 
 
 @app.errorhandler(404)
@@ -219,7 +223,7 @@ def page_not_found(e):
 
 
 @app.errorhandler(400)
-def page_not_found(e):
+def bad_request(e):
     return render_template('400.html'), 400
 
 
