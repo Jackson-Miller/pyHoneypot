@@ -113,7 +113,8 @@ def load_user(userid):
 @app.after_request
 def add_security_headers(response):
     response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' https://*.jsdelivr.net; " \
-                                                  "script-src-elem 'self' https://*.jsdelivr.net "
+                                                  "script-src-elem 'self' https://*.jsdelivr.net " \
+                                                  "https://static.cloudflareinsights.com "
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     response.headers['Permissions-Policy'] = 'accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), ' \
