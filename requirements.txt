@@ -1,7 +1,7 @@
 Authlib~=1.2.0
 azure-core~=1.26.0
 azure-data-tables~=12.4.0
-Flask~=2.3.2
+Flask==2.3.2
 Flask-Login~=0.6.2
 Flask-WTF~=1.1.1
 WTForms~=3.0.1
